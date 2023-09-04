@@ -6,11 +6,11 @@ from facechain.inference import GenPortrait
 import cv2
 from modelscope import snapshot_download
 from facechain.constants import neg_prompt, pos_prompt_with_cloth, pos_prompt_with_style, styles, cloth_prompt
+# sys.path.append(
+#     "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facelib"
+# )
 sys.path.append(
-    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facelib"
-)
-sys.path.append(
-    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch"
+    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion"
 )
 
 
