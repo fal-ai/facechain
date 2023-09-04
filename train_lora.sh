@@ -1,7 +1,7 @@
 export MODEL_NAME=$1
 export VERSION=$2
 export SUB_PATH=$3
-export DATASET_NAME=$4
+export TRAIN_DATA_DIR=$4
 export OUTPUT_DATASET_NAME=$5
 export WORK_DIR=$6
 
@@ -9,7 +9,7 @@ accelerate launch facechain/train_text_to_image_lora.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --revision=$VERSION \
     --sub_path=$SUB_PATH \
-    --dataset_name=$DATASET_NAME \
+    --train_data_dir=$TRAIN_DATA_DIR \
     --output_dataset_name=$OUTPUT_DATASET_NAME \
     --caption_column="text" \
     --resolution=512 --random_flip \
