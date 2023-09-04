@@ -9,6 +9,10 @@ from facechain.constants import neg_prompt, pos_prompt_with_cloth, pos_prompt_wi
 sys.path.append(
     "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facelib"
 )
+sys.path.append(
+    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch"
+)
+
 
 
 def generate_pos_prompt(style_model, prompt_cloth):
