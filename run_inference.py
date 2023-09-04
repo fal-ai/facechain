@@ -20,7 +20,7 @@ def generate_pos_prompt(style_model, prompt_cloth):
 
 
 use_main_model = True
-use_face_swap = True
+use_face_swap = False
 use_post_process = True
 use_stylization = False
 use_depth_control = False
