@@ -401,15 +401,9 @@ def face_swap_fn(use_face_swap, gen_results, template_face):
     if use_face_swap:
         ## TODO
         out_img_list = []
-        import sys
-        sys.path.append(
-            "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch"
-        )
-        sys.path.append(
-            "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facelib"
-        )
-        image_face_fusion = pipeline('face_fusion_torch',
-                                     model='damo/cv_unet_face_fusion_torch', model_revision='v1.0.3')
+        image_face_fusion = pipeline(
+            Tasks.image_face_fusion,
+            model='damo/cv_unet_face_fusion_torch')
         for img in gen_results:
             result = image_face_fusion(dict(template=img, user=template_face))[OutputKeys.OUTPUT_IMG]
             out_img_list.append(result)
