@@ -1,10 +1,14 @@
 # Copyright (c) Alibaba, Inc. and its affiliates.
 import os
 
+import sys
 from facechain.inference import GenPortrait
 import cv2
 from modelscope import snapshot_download
 from facechain.constants import neg_prompt, pos_prompt_with_cloth, pos_prompt_with_style, styles, cloth_prompt
+sys.path.append(
+    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facelib"
+)
 
 
 def generate_pos_prompt(style_model, prompt_cloth):
@@ -20,7 +24,7 @@ def generate_pos_prompt(style_model, prompt_cloth):
 
 
 use_main_model = True
-use_face_swap = False
+use_face_swap = True
 use_post_process = True
 use_stylization = False
 use_depth_control = False
