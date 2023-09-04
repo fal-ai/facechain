@@ -6,21 +6,6 @@ from facechain.inference import GenPortrait
 import cv2
 from modelscope import snapshot_download
 from facechain.constants import neg_prompt, pos_prompt_with_cloth, pos_prompt_with_style, styles, cloth_prompt
-sys.path.append(
-    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facelib"
-)
-sys.path.append(
-    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion"
-)
-sys.path.append(
-    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch"
-)
-sys.path.append(
-    "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facegan"
-)
-
-
-
 
 def generate_pos_prompt(style_model, prompt_cloth):
     if style_model == styles[0]['name'] or style_model is None:
