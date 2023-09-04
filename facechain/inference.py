@@ -405,6 +405,9 @@ def face_swap_fn(use_face_swap, gen_results, template_face):
         sys.path.append(
             "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch"
         )
+        sys.path.append(
+            "/root/.cache/modelscope/hub/damo/cv_unet_face_fusion_torch/image_face_fusion/facelib"
+        )
         image_face_fusion = pipeline('face_fusion_torch',
                                      model='damo/cv_unet_face_fusion_torch', model_revision='v1.0.3')
         for img in gen_results:
