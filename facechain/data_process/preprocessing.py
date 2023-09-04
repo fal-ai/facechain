@@ -268,39 +268,36 @@ def most_similar_faces_pick(imdir, face_detection, face_recognition, face_qualit
     face_angles     = []
     selected_paths  = []
     for index, jpg in enumerate(tqdm(imlist)):
-        try:
-            if not jpg.lower().endswith(('.bmp', '.dib', '.png', '.jpg', '.jpeg', '.pbm', '.pgm', '.ppm', '.tif', '.tiff')):
-                continue
-            img_path = os.path.join(imdir, jpg)
-            image       = Image.open(img_path)
-            h, w, c     = np.shape(image)
+        if not jpg.lower().endswith(('.bmp', '.dib', '.png', '.jpg', '.jpeg', '.pbm', '.pgm', '.ppm', '.tif', '.tiff')):
+            continue
+        img_path = os.path.join(imdir, jpg)
+        image       = Image.open(img_path)
+        h, w, c     = np.shape(image)
 
-            retinaface_box, retinaface_keypoint, _ = call_face_crop(face_detection, image, 3, prefix="tmp")
-            retinaface_keypoint = np.reshape(retinaface_keypoint, [5, 2])
-            # caclculate angle
-            x = retinaface_keypoint[0,0] - retinaface_keypoint[1,0]
-            y = retinaface_keypoint[0,1] - retinaface_keypoint[1,1]
-            angle = 0 if x==0 else abs(math.atan(y/x)*180/math.pi)
-            angle = (90 - angle)/ 90 
+        retinaface_box, retinaface_keypoint, _ = call_face_crop(face_detection, image, 3, prefix="tmp")
+        retinaface_keypoint = np.reshape(retinaface_keypoint, [5, 2])
+        # caclculate angle
+        x = retinaface_keypoint[0,0] - retinaface_keypoint[1,0]
+        y = retinaface_keypoint[0,1] - retinaface_keypoint[1,1]
+        angle = 0 if x==0 else abs(math.atan(y/x)*180/math.pi)
+        angle = (90 - angle)/ 90 
 
-            # face width
-            face_width  = (retinaface_box[2] - retinaface_box[0]) / (3 - 1)
-            face_height = (retinaface_box[3] - retinaface_box[1]) / (3 - 1)
-            if face_width / w < 1/8 or face_height / h < 1/8:
-                continue
+        # face width
+        face_width  = (retinaface_box[2] - retinaface_box[0]) / (3 - 1)
+        face_height = (retinaface_box[3] - retinaface_box[1]) / (3 - 1)
+        if face_width / w < 1/8 or face_height / h < 1/8:
+            continue
 
-            sub_image = image.crop(retinaface_box)
+        sub_image = image.crop(retinaface_box)
 
-            embedding   = np.array(face_recognition(sub_image)[OutputKeys.IMG_EMBEDDING])
-            score       = face_quality_func(sub_image)[OutputKeys.SCORES]
-            score       = 0 if score is None else score[0]
+        embedding   = np.array(face_recognition(sub_image)[OutputKeys.IMG_EMBEDDING])
+        score       = face_quality_func(sub_image)[OutputKeys.SCORES]
+        score       = 0 if score is None else score[0]
 
-            face_id_scores.append(embedding)
-            quality_scores.append(score)
-            face_angles.append(angle)
-            selected_paths.append(jpg)
-        except Exception as e:
-            print(f'skipping {jpg} due to processing error {e}')
+        face_id_scores.append(embedding)
+        quality_scores.append(score)
+        face_angles.append(angle)
+        selected_paths.append(jpg)
 
     # sort all scores with muliply
     face_id_scores      = compare_jpg_with_face_id(face_id_scores)
@@ -356,111 +353,107 @@ class Blipv2():
         cnt = 0
         tmp_path = os.path.join(savedir, 'tmp.png')
         for imname in _selected_paths:
-            try:
-                # if 1:
-                if imname.startswith('.'):
-                    continue
-                img_path = os.path.join(imdir, imname)
-                im = cv2.imread(img_path)
-                h, w, _ = im.shape
-                max_size = max(w, h)
-                ratio = 1024 / max_size
-                new_w = round(w * ratio)
-                new_h = round(h * ratio)
-                imt = cv2.resize(im, (new_w, new_h))
-                cv2.imwrite(tmp_path, imt)
-                result_det = self.face_detection(tmp_path)
-                bboxes = result_det['boxes']
-                if len(bboxes) > 1:
-                    areas = []
-                    for i in range(len(bboxes)):
-                        bbox = bboxes[i]
-                        areas.append((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
-                    areas = np.array(areas)
-                    areas_new = np.sort(areas)[::-1]
-                    idxs = np.argsort(areas)[::-1]
-                    if areas_new[0] < 4 * areas_new[1]:
-                        print('Detecting multiple faces, do not use image {}.'.format(imname))
-                        continue
-                    else:
-                        keypoints = result_det['keypoints'][idxs[0]]
-                elif len(bboxes) == 0:
-                    print('Detecting no face, do not use image {}.'.format(imname))
+            # if 1:
+            if imname.startswith('.'):
+                continue
+            img_path = os.path.join(imdir, imname)
+            im = cv2.imread(img_path)
+            h, w, _ = im.shape
+            max_size = max(w, h)
+            ratio = 1024 / max_size
+            new_w = round(w * ratio)
+            new_h = round(h * ratio)
+            imt = cv2.resize(im, (new_w, new_h))
+            cv2.imwrite(tmp_path, imt)
+            result_det = self.face_detection(tmp_path)
+            bboxes = result_det['boxes']
+            if len(bboxes) > 1:
+                areas = []
+                for i in range(len(bboxes)):
+                    bbox = bboxes[i]
+                    areas.append((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+                areas = np.array(areas)
+                areas_new = np.sort(areas)[::-1]
+                idxs = np.argsort(areas)[::-1]
+                if areas_new[0] < 4 * areas_new[1]:
+                    print('Detecting multiple faces, do not use image {}.'.format(imname))
                     continue
                 else:
-                    keypoints = result_det['keypoints'][0]
+                    keypoints = result_det['keypoints'][idxs[0]]
+            elif len(bboxes) == 0:
+                print('Detecting no face, do not use image {}.'.format(imname))
+                continue
+            else:
+                keypoints = result_det['keypoints'][0]
 
-                im = rotate(im, keypoints)
-                ns = im.shape[0]
-                imt = cv2.resize(im, (1024, 1024))
-                cv2.imwrite(tmp_path, imt)
-                result_det = self.face_detection(tmp_path)
-                bboxes = result_det['boxes']
+            im = rotate(im, keypoints)
+            ns = im.shape[0]
+            imt = cv2.resize(im, (1024, 1024))
+            cv2.imwrite(tmp_path, imt)
+            result_det = self.face_detection(tmp_path)
+            bboxes = result_det['boxes']
 
-                if len(bboxes) > 1:
-                    areas = []
-                    for i in range(len(bboxes)):
-                        bbox = bboxes[i]
-                        areas.append((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
-                    areas = np.array(areas)
-                    areas_new = np.sort(areas)[::-1]
-                    idxs = np.argsort(areas)[::-1]
-                    if areas_new[0] < 4 * areas_new[1]:
-                        print('Detecting multiple faces after rotation, do not use image {}.'.format(imname))
-                        continue
-                    else:
-                        bbox = bboxes[idxs[0]]
-                elif len(bboxes) == 0:
-                    print('Detecting no face after rotation, do not use this image {}'.format(imname))
+            if len(bboxes) > 1:
+                areas = []
+                for i in range(len(bboxes)):
+                    bbox = bboxes[i]
+                    areas.append((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+                areas = np.array(areas)
+                areas_new = np.sort(areas)[::-1]
+                idxs = np.argsort(areas)[::-1]
+                if areas_new[0] < 4 * areas_new[1]:
+                    print('Detecting multiple faces after rotation, do not use image {}.'.format(imname))
                     continue
                 else:
-                    bbox = bboxes[0]
+                    bbox = bboxes[idxs[0]]
+            elif len(bboxes) == 0:
+                print('Detecting no face after rotation, do not use this image {}'.format(imname))
+                continue
+            else:
+                bbox = bboxes[0]
 
-                for idx in range(4):
-                    bbox[idx] = bbox[idx] * ns / 1024
-                imr = crop_and_resize(im, bbox)
-                cv2.imwrite(tmp_path, imr)
+            for idx in range(4):
+                bbox[idx] = bbox[idx] * ns / 1024
+            imr = crop_and_resize(im, bbox)
+            cv2.imwrite(tmp_path, imr)
 
-                result = self.skin_retouching(tmp_path)
-                if (result is None or (result[OutputKeys.OUTPUT_IMG] is None)):
-                    print('Cannot do skin retouching, do not use this image.')
-                    continue
-                cv2.imwrite(tmp_path, result[OutputKeys.OUTPUT_IMG])
+            result = self.skin_retouching(tmp_path)
+            if (result is None or (result[OutputKeys.OUTPUT_IMG] is None)):
+                print('Cannot do skin retouching, do not use this image.')
+                continue
+            cv2.imwrite(tmp_path, result[OutputKeys.OUTPUT_IMG])
 
-                result = self.segmentation_pipeline(tmp_path)
-                mask_head = get_mask_head(result)
-                im = cv2.imread(tmp_path)
-                im = im * mask_head + 255 * (1 - mask_head)
-                # print(im.shape)
+            result = self.segmentation_pipeline(tmp_path)
+            mask_head = get_mask_head(result)
+            im = cv2.imread(tmp_path)
+            im = im * mask_head + 255 * (1 - mask_head)
+            # print(im.shape)
 
-                raw_result = self.facial_landmark_confidence_func(im)
-                if raw_result is None:
-                    print('landmark quality fail...')
-                    continue
+            raw_result = self.facial_landmark_confidence_func(im)
+            if raw_result is None:
+                print('landmark quality fail...')
+                continue
 
-                print(imname, raw_result['scores'][0])
-                if float(raw_result['scores'][0]) < (1 - 0.145):
-                    print('landmark quality fail...')
-                    continue
+            print(imname, raw_result['scores'][0])
+            if float(raw_result['scores'][0]) < (1 - 0.145):
+                print('landmark quality fail...')
+                continue
 
-                cv2.imwrite(os.path.join(savedir, '{}.png'.format(cnt)), im)
-                imgs_list.append('{}.png'.format(cnt))
-                img = Image.open(os.path.join(savedir, '{}.png'.format(cnt)))
-                result = self.model.tag(img)
-                print(result)
-                attribute_result = self.fair_face_attribute_func(tmp_path)
-                if cnt == 0:
-                    score_gender = np.array(attribute_result['scores'][0])
-                    score_age = np.array(attribute_result['scores'][1])
-                else:
-                    score_gender += np.array(attribute_result['scores'][0])
-                    score_age += np.array(attribute_result['scores'][1])
+            cv2.imwrite(os.path.join(savedir, '{}.png'.format(cnt)), im)
+            imgs_list.append('{}.png'.format(cnt))
+            img = Image.open(os.path.join(savedir, '{}.png'.format(cnt)))
+            result = self.model.tag(img)
+            print(result)
+            attribute_result = self.fair_face_attribute_func(tmp_path)
+            if cnt == 0:
+                score_gender = np.array(attribute_result['scores'][0])
+                score_age = np.array(attribute_result['scores'][1])
+            else:
+                score_gender += np.array(attribute_result['scores'][0])
+                score_age += np.array(attribute_result['scores'][1])
 
-                result_list.append(result.split(', '))
-                cnt += 1
-            except Exception as e:
-                print('cathed for image process of ' + imname)
-                print(f'Error: {e}')
+            result_list.append(result.split(', '))
+            cnt += 1
 
         print(result_list)
         if len(result_list) == 0:
@@ -470,10 +463,8 @@ class Blipv2():
 
         result_list = post_process_naive(result_list, score_gender, score_age)
         self.model.stop()
-        try:
-            os.remove(tmp_path)
-        except OSError as e:
-            print(f"Failed to remove path {tmp_path}: {e}")
+
+        os.remove(tmp_path)
 
         out_json_name = os.path.join(savedir, "metadata.jsonl")
         fo = open(out_json_name, 'w')

@@ -980,6 +980,7 @@ def main():
             args.dataset_config_name,
             cache_dir=args.cache_dir,
         )
+        print(f'oida: {dataset}')
     else:
         # This branch will not be called
         data_files = {}
