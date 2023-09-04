@@ -107,7 +107,6 @@ def train_lora_fn(base_model_path=None, revision=None, sub_path=None, output_img
                 --merge_best_lora_based_face_id \
                 --revision="{revision}" \
                 --sub_path="{sub_path}" \
-                --train_data_dir="/data/facechain_dataset_labeled"
             '''
         )
     else:
