@@ -18,7 +18,7 @@ def generate_pos_prompt(style_model, prompt_cloth):
         pos_prompt = pos_prompt_with_style.format(matched['add_prompt_style'])
     return pos_prompt
 
-
+job_dir = os.environ["JOB_DIR"]
 use_main_model = True
 use_face_swap = True
 use_post_process = True
@@ -26,15 +26,15 @@ use_stylization = False
 use_depth_control = False
 use_pose_model = False
 pose_image = 'poses/man/pose1.png'
-processed_dir = '/data/facechain_dataset'
-num_generate = 5
+processed_dir = job_dir + '/dataset'
+num_generate = 1
 base_model = 'ly261666/cv_portrait_model'
 revision = 'v2.0'
 multiplier_style = 0.25
 multiplier_human = 0.85
 base_model_sub_dir = 'film/film'
-train_output_dir = '/data/facechain_work_dir'
-output_dir = '/data/facechain_generated'
+train_output_dir = job_dir + '/work'
+output_dir = job_dir + '/results'
 use_style = False
 style = styles[1]
 model_id = style['model_id']
